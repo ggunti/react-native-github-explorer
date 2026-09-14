@@ -1,29 +1,37 @@
-import {
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-} from 'react-native';
+import { Button, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useState } from 'react';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../types/navigation';
 
 function SearchRepos() {
-  const isDarkMode = useColorScheme() === 'dark';
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [keyword, setKeyword] = useState('');
+
+  const onPressSearch = () => {
+    navigation.navigate('ReposList', { keyword });
+  };
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text>SearchReposScreen</Text>
-      </ScrollView>
+      <View style={styles.container}>
+        <TextInput
+          placeholder="Search by keyword (ex. react-native)"
+          value={keyword}
+          onChangeText={setKeyword}
+        />
+        <Button title="Search" onPress={onPressSearch} />
+      </View>
     </SafeAreaProvider>
   );
 }
 
+export default SearchRepos;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    marginHorizontal: 8,
   },
 });
-
-export default SearchRepos;
