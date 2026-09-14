@@ -11,7 +11,10 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootStack() {
   return (
-    <Stack.Navigator initialRouteName="SearchRepos">
+    <Stack.Navigator
+      initialRouteName="SearchRepos"
+      screenOptions={{ headerTitleStyle: { fontSize: 16 } }}
+    >
       <Stack.Screen
         name="SearchRepos"
         component={SearchRepos}
@@ -21,12 +24,16 @@ function RootStack() {
         name="ReposList"
         component={ReposList}
         initialParams={{ keyword: '' }}
-        options={{ title: 'Repository Results' }}
+        options={({ route }) => ({
+          title: `Results for: ${route.params.keyword}`,
+        })}
       />
       <Stack.Screen
         name="RepoDetails"
         component={RepoDetails}
-        options={{ title: 'Repository Details' }}
+        options={({ route }) => ({
+          title: route.params.repo.name || 'Repository Details',
+        })}
       />
     </Stack.Navigator>
   );
