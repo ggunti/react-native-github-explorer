@@ -1,17 +1,15 @@
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { View, Text, ScrollView, StyleSheet, Image } from 'react-native';
-import { RootStackParamList } from '../../types/navigation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Separator, Tags } from '../../common';
 import { ExternalLink } from './components';
 import { formatDate } from '../../utils';
+import type { RootStackParamList } from '../../types/navigation';
 
 function RepoDetails() {
   const route = useRoute<RouteProp<RootStackParamList, 'RepoDetails'>>();
   const insets = useSafeAreaInsets();
   const { repo } = route.params;
-
-  console.log(repo);
 
   const renderOwnerDetails = () => {
     return (
