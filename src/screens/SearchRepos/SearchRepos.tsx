@@ -20,7 +20,7 @@ function SearchRepos() {
           value={keyword}
           onChangeText={setKeyword}
         />
-        <Button title="Search" onPress={onPressSearch} />
+        <Button title="Search" onPress={onPressSearch} disabled={!keyword} />
       </View>
     </SafeAreaProvider>
   );
