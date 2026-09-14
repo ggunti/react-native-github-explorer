@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from 'react';
 import {
   NavigationProp,
   RouteProp,
@@ -5,7 +6,6 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import {
-  FlatList,
   Image,
   Pressable,
   StyleSheet,
@@ -14,12 +14,13 @@ import {
   ActivityIndicator,
   Button,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { RootStackParamList } from '../../types/navigation';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Separator, Tags } from '../../common';
-import type { GithubRepoItem, GithubReposResponse } from '../../types/github';
 import { formatDate } from '../../utils';
+import type { RootStackParamList } from '../../types/navigation';
+import type { GithubRepoItem, GithubReposResponse } from '../../types/github';
 
 const PER_PAGE = 100;
 
@@ -48,12 +49,34 @@ function ReposList() {
     },
   });
 
-  const repos = data?.pages.flatMap(page => page.items) ?? [];
+  const repos = useMemo(
+    () => data?.pages.flatMap(page => page.items) ?? [],
+    [data],
+  );
 
   const onEndReached = () => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
+  };
+
+  const renderLoadingIndicator = () => {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="gray" />
+      </View>
+    );
+  };
+
+  const renderError = () => {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>
+          Oups! Something went wrong: {error?.message}
+        </Text>
+        <Button title="Retry" onPress={() => refetch()} />
+      </View>
+    );
   };
 
   const renderItem = ({ item }: { item: GithubRepoItem }) => {
@@ -80,39 +103,42 @@ function ReposList() {
             <Text style={styles.description}>{item.description}</Text>
           </View>
         </View>
-        {tags.length > 0 && (
-          <Tags items={[stars, language, updatedAt].filter(Boolean)} />
-        )}
+        {tags.length > 0 && <Tags items={tags} />}
       </Pressable>
     );
   };
 
+  useEffect(() => {
+    const totalCount = data?.pages?.[0]?.total_count;
+    if (totalCount) {
+      navigation.setOptions({
+        title: `Results for: ${route.params.keyword} (${repos.length}/${totalCount})`,
+      });
+    }
+  }, [navigation, route.params.keyword, repos.length, data?.pages]);
+
   return (
     <View style={{ ...styles.container, paddingBottom: insets.bottom }}>
-      {isPending && <ActivityIndicator size="large" color="gray" />}
-      {error && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>
-            Oups! Something went wrong: {error.message}
-          </Text>
-          <Button title="Retry" onPress={() => refetch()} />
-        </View>
-      )}
-      {repos.length > 0 && (
-        <FlatList
-          data={repos}
-          renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
-          ItemSeparatorComponent={Separator}
-          onEndReachedThreshold={0.5}
-          onEndReached={onEndReached}
-          ListFooterComponent={
-            isFetchingNextPage ? (
-              <ActivityIndicator size="small" color="gray" />
-            ) : undefined
-          }
-        />
-      )}
+      {isPending && renderLoadingIndicator()}
+      {error && renderError()}
+      <FlashList
+        data={repos}
+        renderItem={renderItem}
+        keyExtractor={item => item.id.toString()}
+        ItemSeparatorComponent={Separator}
+        onEndReachedThreshold={0.5}
+        onEndReached={onEndReached}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <ActivityIndicator size="small" color="gray" />
+          ) : undefined
+        }
+        ListEmptyComponent={
+          !isPending && !error ? (
+            <Text style={styles.emptyText}>No results found</Text>
+          ) : undefined
+        }
+      />
     </View>
   );
 }
@@ -122,15 +148,24 @@ export default ReposList;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    paddingVertical: 8,
   },
   errorContainer: {
     alignItems: 'center',
+    paddingVertical: 8,
   },
   errorText: {
     textAlign: 'center',
     color: 'red',
     marginBottom: 8,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: 'gray',
+    paddingVertical: 8,
   },
   item: {
     flex: 1,
