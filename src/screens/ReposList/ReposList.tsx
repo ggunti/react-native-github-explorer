@@ -1,14 +1,28 @@
-import { RouteProp, useRoute } from '@react-navigation/native';
-import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import {
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../types/navigation';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { Separator } from '../../components';
+import { Separator, Tags } from '../../common';
 import type { GithubRepoItem, GithubReposResponse } from '../../types/github';
+import { formatDate } from '../../utils';
 
 const PER_PAGE = 100;
 
 function ReposList() {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, 'ReposList'>>();
   const insets = useSafeAreaInsets();
   const {
@@ -34,8 +48,19 @@ function ReposList() {
   const repos = data?.pages.flatMap(page => page.items) ?? [];
 
   const renderItem = ({ item }: { item: GithubRepoItem }) => {
+    const stars = item.stargazers_count ? `${item.stargazers_count} Stars` : '';
+    const language = item.language ? item.language : '';
+    const updatedAt = item.updated_at
+      ? `Updated at ${formatDate(item.updated_at)}`
+      : '';
+
+    const tags = [stars, language, updatedAt].filter(Boolean);
+
     return (
-      <View style={styles.item}>
+      <Pressable
+        style={styles.item}
+        onPress={() => navigation.navigate('RepoDetails', { repo: item })}
+      >
         <View style={styles.header}>
           <Image
             source={{ uri: item.owner.avatar_url }}
@@ -46,19 +71,10 @@ function ReposList() {
             <Text style={styles.description}>{item.description}</Text>
           </View>
         </View>
-        <View style={styles.topics}>
-          {!!item.stargazers_count && (
-            <Text style={styles.topic}>{item.stargazers_count} Stars</Text>
-          )}
-          {!!item.language && <Text style={styles.topic}>{item.language}</Text>}
-          {!!item.updated_at && (
-            <Text style={styles.topic}>
-              Updated at {new Date(item.updated_at).toLocaleDateString()}{' '}
-              {new Date(item.updated_at).toLocaleTimeString()}
-            </Text>
-          )}
-        </View>
-      </View>
+        {tags.length > 0 && (
+          <Tags items={[stars, language, updatedAt].filter(Boolean)} />
+        )}
+      </Pressable>
     );
   };
 
@@ -120,16 +136,6 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  topics: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 4,
-  },
-  topic: {
-    backgroundColor: 'lightgray',
-    padding: 4,
-    borderRadius: 4,
   },
   footer: {
     textAlign: 'center',

@@ -5,6 +5,7 @@ import SearchRepos from './screens/SearchRepos/SearchRepos';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReposList from './screens/ReposList/ReposList';
 import { RootStackParamList } from './types/navigation';
+import RepoDetails from './screens/RepoDetails/RepoDetails';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -21,6 +22,11 @@ function RootStack() {
         component={ReposList}
         initialParams={{ keyword: '' }}
         options={{ title: 'Repository Results' }}
+      />
+      <Stack.Screen
+        name="RepoDetails"
+        component={RepoDetails}
+        options={{ title: 'Repository Details' }}
       />
     </Stack.Navigator>
   );
