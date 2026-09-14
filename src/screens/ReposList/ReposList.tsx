@@ -11,6 +11,8 @@ import {
   StyleSheet,
   Text,
   View,
+  ActivityIndicator,
+  Button,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../types/navigation';
@@ -32,6 +34,7 @@ function ReposList() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    refetch,
   } = useInfiniteQuery({
     queryKey: ['githubRepos', route.params.keyword],
     queryFn: ({ pageParam }): Promise<GithubReposResponse> =>
@@ -46,6 +49,12 @@ function ReposList() {
   });
 
   const repos = data?.pages.flatMap(page => page.items) ?? [];
+
+  const onEndReached = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
 
   const renderItem = ({ item }: { item: GithubRepoItem }) => {
     const stars = item.stargazers_count ? `${item.stargazers_count} Stars` : '';
@@ -78,16 +87,17 @@ function ReposList() {
     );
   };
 
-  const onEndReached = () => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  };
-
   return (
-    <View style={{ paddingBottom: insets.bottom }}>
-      {isPending && <Text>Loading...</Text>}
-      {error && <Text>Error: {error.message}</Text>}
+    <View style={{ ...styles.container, paddingBottom: insets.bottom }}>
+      {isPending && <ActivityIndicator size="large" color="gray" />}
+      {error && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>
+            Oups! Something went wrong: {error.message}
+          </Text>
+          <Button title="Retry" onPress={() => refetch()} />
+        </View>
+      )}
       {repos.length > 0 && (
         <FlatList
           data={repos}
@@ -98,7 +108,7 @@ function ReposList() {
           onEndReached={onEndReached}
           ListFooterComponent={
             isFetchingNextPage ? (
-              <Text style={styles.footer}>Loading more...</Text>
+              <ActivityIndicator size="small" color="gray" />
             ) : undefined
           }
         />
@@ -110,6 +120,18 @@ function ReposList() {
 export default ReposList;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  errorContainer: {
+    alignItems: 'center',
+  },
+  errorText: {
+    textAlign: 'center',
+    color: 'red',
+    marginBottom: 8,
+  },
   item: {
     flex: 1,
     margin: 8,
