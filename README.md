@@ -43,3 +43,14 @@ Use the [debug apk](https://limewire.com/d/fD5qI#hpHi3aVjWB) to check the app on
 - use a global state management tool (ex. redux or zustand) to store all the fetched items
 - add unit + e2e tests
 - enforce eslint + typescript rules at git commit / push via husky or hooks
+
+## Screenshots
+
+<img src="https://github.com/ggunti/react-native-github-explorer/blob/main/readme_assets/screenshots/1.png" alt="ss-1" width="600">
+<img src="https://github.com/ggunti/react-native-github-explorer/blob/main/readme_assets/screenshots/2.png" alt="ss-2" width="600">
+<img src="https://github.com/ggunti/react-native-github-explorer/blob/main/readme_assets/screenshots/3.png" alt="ss-3" width="600">
+<img src="https://github.com/ggunti/react-native-github-explorer/blob/main/readme_assets/screenshots/4.png" alt="ss-4" width="600">
+<img src="https://github.com/ggunti/react-native-github-explorer/blob/main/readme_assets/screenshots/5.png" alt="ss-5" width="600">
+<img src="https://github.com/ggunti/react-native-github-explorer/blob/main/readme_assets/screenshots/6.png" alt="ss-6" width="600">
+<img src="https://github.com/ggunti/react-native-github-explorer/blob/main/readme_assets/screenshots/7.png" alt="ss-7" width="600">
+<img src="https://github.com/ggunti/react-native-github-explorer/blob/main/readme_assets/screenshots/8.png" alt="ss-8" width="600">
