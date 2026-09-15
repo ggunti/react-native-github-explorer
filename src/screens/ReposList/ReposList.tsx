@@ -100,7 +100,13 @@ function ReposList() {
           />
           <View style={styles.headerContent}>
             <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.description}>{item.description}</Text>
+            {!!item.description && (
+              <Text style={styles.description}>
+                {item.description.length > 100
+                  ? item.description.slice(0, 100) + '...'
+                  : item.description}
+              </Text>
+            )}
           </View>
         </View>
         {tags.length > 0 && <Tags items={tags} />}
