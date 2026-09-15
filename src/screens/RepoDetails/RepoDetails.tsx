@@ -41,7 +41,9 @@ function RepoDetails() {
   const renderRepoDetails = () => {
     return (
       <View>
-        {repo.topics?.length > 0 && <Tags items={repo.topics} />}
+        {repo.topics?.length > 0 && (
+          <Tags items={repo.topics} containerStyle={styles.tagsContainer} />
+        )}
         <View style={styles.row}>
           <Text style={styles.grayInfo}>Name: </Text>
           <Text style={styles.normalInfo}>{repo.name}</Text>
@@ -58,10 +60,12 @@ function RepoDetails() {
           <Text style={styles.grayInfo}>Clone URL: </Text>
           <ExternalLink url={repo.clone_url} />
         </View>
-        <View style={styles.row}>
-          <Text style={styles.grayInfo}>Description: </Text>
-          <Text style={styles.normalInfo}>{repo.description}</Text>
-        </View>
+        {!!repo.description && (
+          <View style={styles.row}>
+            <Text style={styles.grayInfo}>Description: </Text>
+            <Text style={styles.normalInfo}>{repo.description}</Text>
+          </View>
+        )}
         <View style={styles.row}>
           <Text style={styles.grayInfo}>Language: </Text>
           <Text style={styles.normalInfo}>{repo.language}</Text>
@@ -146,6 +150,9 @@ const styles = StyleSheet.create({
   ownerName: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  tagsContainer: {
+    marginBottom: 4,
   },
   row: {
     flexDirection: 'row',

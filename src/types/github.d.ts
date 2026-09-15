@@ -1,7 +1,7 @@
 export type GithubRepoItem = {
   id: number;
   name: string;
-  description: string;
+  description?: string;
   stargazers_count: number;
   language: string;
   created_at: string;
